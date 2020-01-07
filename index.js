@@ -39,6 +39,29 @@ app.get('/adduser',(req,res)=>{
     res.render('add-users');
 })
 
+app.post('/adduser',(req,res)=>{
+    console.log(req.body);
+    let {name , username , password , gender , contact ,boss} = req.body;
+    var newuser = new employee({
+
+        name,
+        username,
+        password,
+        gender,
+        contact,
+        boss
+    })
+    newuser.password = bcrypt.hashSync(password,10);
+    newuser.save()
+    .then((user)=>{
+
+        console.log(user +' saved in database');
+        res.redirect('/dashboard');
+    })
+    .catch((err)=>{
+        res.send(err);
+    })
+})
 // route for user login using passport
 app.post('/login',passport.authenticate('login',{
     successRedirect :'/dashboard',
@@ -77,29 +100,6 @@ app.get('/employee/dashboard',auth.entureauthenticated,(req,res)=>{
        
      
   
-})
-
-app.post('/adduser',(req,res)=>{
-    console.log(req.body);
-    let {name , username , password , gender , contact ,boss} = req.body;
-    var newuser = new employee({
-
-        name,
-        username,
-        password,
-        gender,
-        contact,
-        boss
-    })
-    newuser.password = bcrypt.hashSync(password,10);
-    newuser.save()
-    .then((user)=>{
-
-        res.send(user +' saved in database');
-    })
-    .catch((err)=>{
-        res.send(err);
-    })
 })
 
  app.get('/boss/givetask',auth.entureauthenticated,(req,res)=>{
@@ -225,6 +225,36 @@ app.get('/showtaskhistory/:id',(req,res)=>{
         res.send(err);
     })
 })
+
+app.get('/changeprofile',auth.entureauthenticated,(req,res)=>{
+    res.render('change-profile-information');
+})
+
+app.get('/changepassword',auth.entureauthenticated,(req,res)=>{
+    res.render('changepassword');
+})
+
+app.post('/changepassword',auth.entureauthenticated,(req,res)=>{
+    var {oldusername,oldpassword,newusername,newpassword} = req.body ;
+    // compare old password with real password
+
+    if(oldusername == req.user.username && bcrypt.compareSync(oldpassword, req.user.password)){
+        console.log('username and password matched. now you can change your password');
+        // change password 
+        req.user.username = newusername;
+        req.user.password = bcrypt.hashSync(newpassword , 10);
+        req.user.save().then((user)=>{
+            console.log('username and password changed')
+            res.redirect('/dashboard');
+        })
+        .catch((err)=>{
+            res.send(err);
+        })
+
+    }else
+        console.log('username or password incorrect');
+    }
+)
 
 app.get('/logout',(req,res)=>{
     req.logout();
