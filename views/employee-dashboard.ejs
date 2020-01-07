@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>EMPLOYEE DASHBOARD</title>
+</head>
+<body>
+    <H5> WELCOME TO THE EMPLOYEE DASHBOARD <%= employee.name %></H5><br><hr>
+  
+        <% if(task){ %>
+            <p>you have a pending task <br>
+                <h4>TASK DETAILS</h4>
+                Description : <%= task.task.description %> <br>
+                Material:  <a href="<%= task.task.material %>"> view the material</a>   <br>
+                bossname:<%= task.bossname %> <br> <hr>
+
+                <a href="/taskcompleted"> completed</a>
+            </p>
+       <% }else{ %>
+        <p> you have no task pending</p>
+        <% }%>
+
+         <a href="/logout"> logout</a>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Assign task to employee</title>
+</head>
+<body>
+    <h5>ASSIGN TASK TO EMPLOYEE <%= user.name %></h5>
+
+    <form action="/boss/givetasktoemployee/<%=user._id  %>/<%= boss %>" method="post">
+   description : <input type="text" name="desc" required> <br>
+   material : <input type="text" name="material" required> <br>
+   <input type="submit" value="submit">
+    </form> <br> <hr>
+    
+
+</body>
+</html>
