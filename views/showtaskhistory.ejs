@@ -7,11 +7,23 @@
     <title>TASK HISTORY</title>
 </head>
 <body>
-    <h4>task history about </h4>
+    <%- include('./profileimage', {employee: loggeduser}); %>
+    <h4>task history about <%= name %> </h4><hr>
     <% if(tasks){ %>
             <% tasks.forEach(function(task){ %>
 
-                    <p><%=task%></p>    
+                <p>bossname : <%= task.bossname %></p>
+                <p>task details :<ul>
+                    <li><%= task.task.description %> </li>
+                    <li><%= task.task.material %> </li>
+                </ul></p>
+                <p>completed details :
+                    <ul>
+                        <li><%= task.complete.description %> </li>
+                        <li><%= task.complete.material %> </li>
+                    </ul>
+                </p>
+                <hr>
             <% }) %>
         <% } %>
 </body>

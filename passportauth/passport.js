@@ -34,9 +34,11 @@ module.exports = function (passport) {
                 return done(err);
             }
             if (!user) {
+                console.log('no user');
                 return done(null, false);
             }
             if (! bcrypt.compareSync(password, user.password)) {
+                console.log('password do not match');
                 return done(null, false);
             }
             if (user) {

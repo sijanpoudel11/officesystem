@@ -7,6 +7,7 @@
     <title>confirm task completion</title>
 </head>
 <body>
+    <%- include('./profileimage', {employee: loggeduser}); %>
     <h2>CONFIRM TASK COMPLETION</h2>
     <form action="/taskcompleted" method="post">
         description :  <input type="text" name="description">

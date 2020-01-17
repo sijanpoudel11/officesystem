@@ -21,6 +21,11 @@ var alluser = mongoose.Schema({
         type : String ,
         required : true
     } ,
+     imagename :   {
+                type : String 
+        }
+    ,
+
     boss : {
         type : Boolean ,
         required : true

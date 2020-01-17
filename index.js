@@ -4,26 +4,40 @@ var bcrypt = require('bcryptjs');
 var session = require('express-session');
 var bodyparser = require('body-parser');
 var mongoose = require('mongoose');
+var multer = require('multer');
+var path = require('path');
 var employee = require('./models/allusers');
 var tasks = require('./models/tasks');
 var auth = require('./passportauth/auth');
+
 require('./passportauth/passport')(passport);
 
 var app = express();
 
 // setup middleware
 app.set('view engine','ejs');
+app.use(express.static('public'));
+app.use(express.static('uploads'));
+
+app.use(bodyparser.urlencoded({extended:true}));
 app.use(session({secret: "secret", resave: false, saveUninitialized: false,cookie:{
     maxAge: 24*60*60
 }}));
+
+var storage = multer.diskStorage({
+    destination : "./uploads/images/" ,
+    filename : (req,file,cb)=>{
+        cb(null,req.body.username + path.extname(file.originalname));
+    }
+});
+
+var upload = multer({storage:storage}).single('photo')
 
 // passport
 
 app.use(passport.initialize());
 
 app.use(passport.session());
-
-app.use(bodyparser.urlencoded({extended : true}));
 
 mongoose.connect('mongodb://localhost/officesystem', {useNewUrlParser: true, useUnifiedTopology : true}).then(() => {
     console.log('database connected');
@@ -35,13 +49,14 @@ app.get('/',auth.redirectdashboard,(req,res)=>{
     res.render('login');
 })
 
-app.get('/adduser',(req,res)=>{
+app.get('/adduser',auth.entureboss,(req,res)=>{
     res.render('add-users');
 })
 
-app.post('/adduser',(req,res)=>{
-    console.log(req.body);
+app.post('/adduser',upload,(req,res)=>{
+    console.log(req.file);
     let {name , username , password , gender , contact ,boss} = req.body;
+    var imagename = req.file.filename;
     var newuser = new employee({
 
         name,
@@ -49,8 +64,10 @@ app.post('/adduser',(req,res)=>{
         password,
         gender,
         contact,
+        imagename,
         boss
     })
+   
     newuser.password = bcrypt.hashSync(password,10);
     newuser.save()
     .then((user)=>{
@@ -104,7 +121,7 @@ app.get('/employee/dashboard',auth.entureauthenticated,(req,res)=>{
 
  app.get('/boss/givetask',auth.entureauthenticated,(req,res)=>{
      var employees = employee.find({boss : false },(err,users)=>{
-        res.render('viewallemployees',{users});
+        res.render('viewallemployees',{users,loggeduser : req.user});
      }) 
  })
  
@@ -113,7 +130,7 @@ app.get('/employee/dashboard',auth.entureauthenticated,(req,res)=>{
      var id = req.params.id;
      employee.findOne({_id : id}).then((user)=>{
         
-          res.render('givetasktoemployee',{user:user,boss : req.user.name })
+          res.render('givetasktoemployee',{user:user,boss : req.user.name,loggeduser:req.user })
 
              
 
@@ -128,7 +145,7 @@ app.get('/employee/dashboard',auth.entureauthenticated,(req,res)=>{
         var id = req.params.id;
         var name = req.params.name;
         tasks.findOne({employeeid : id}).then((task)=>{
-            res.render('showtasktoboss',{task , name})
+            res.render('showtasktoboss',{task , name,loggeduser:req.user})
         }).catch((err)=>{
             res.send(err);
         })
@@ -176,7 +193,7 @@ app.get('/employee/dashboard',auth.entureauthenticated,(req,res)=>{
  app.get('/taskcompleted/',(req,res)=>{
     console.log(req.user);
     var id = req.params.id;
-     res.render('taskcompleted',{id : id})
+     res.render('taskcompleted',{id : id,loggeduser:req.user})
  })
 
 app.post('/taskcompleted',(req,res)=>{
@@ -206,32 +223,33 @@ app.post('/taskcompleted',(req,res)=>{
 
 })
 
-app.get('/seeemployees',(req,res)=>{
+app.get('/seeemployees',auth.entureauthenticated,(req,res)=>{
     employee.find({boss: false})
     .then((employees)=>{
         console.log(employees);
-        res.render('seeallemployees',{employees});
+        res.render('seeallemployees',{employees,loggeduser:req.user});
     }).catch((err)=>{
         res.send(err);
     })
 })
 
-app.get('/showtaskhistory/:id',(req,res)=>{
+app.get('/showtaskhistory/:id/:name',(req,res)=>{
     var id = req.params.id;
+    var name = req.params.name;
     tasks.find({employeeid:id , completed : true})
     .then((task)=>{
-        res.render('showtaskhistory',{tasks:task});
+        res.render('showtaskhistory',{tasks:task,name:name,loggeduser:req.user});
     }).catch((err)=>{
         res.send(err);
     })
 })
 
 app.get('/changeprofile',auth.entureauthenticated,(req,res)=>{
-    res.render('change-profile-information');
+    res.render('change-profile-information',{loggeduser:req.user});
 })
 
 app.get('/changepassword',auth.entureauthenticated,(req,res)=>{
-    res.render('changepassword');
+    res.render('changepassword',{loggeduser:req.user});
 })
 
 app.post('/changepassword',auth.entureauthenticated,(req,res)=>{

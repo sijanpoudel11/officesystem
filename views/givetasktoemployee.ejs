@@ -7,6 +7,7 @@
     <title>Assign task to employee</title>
 </head>
 <body>
+    <%- include('./profileimage', {employee: loggeduser}); %>
     <h5>ASSIGN TASK TO EMPLOYEE <%= user.name %></h5>
 
     <form action="/boss/givetasktoemployee/<%=user._id  %>/<%= boss %>" method="post">

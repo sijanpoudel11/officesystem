@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
     <title>Document</title>
 </head>
 <body>
     <h4>EMPLOYEES</h4>
+    <%- include('./profileimage', {employee: loggeduser}); %>
+
     
         <% employees.forEach(function(employee) {%>
-            <a href="/showtaskhistory/<%= employee._id %>"> <%= employee.name %></a> <hr>
+            <a href="/showtaskhistory/<%= employee._id %>/<%= employee.name %>"> <%= employee.name %></a> <hr>
             <% }) %>
 </body>
 </html>

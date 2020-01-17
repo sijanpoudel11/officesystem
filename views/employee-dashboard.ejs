@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/style.css">
     <title>EMPLOYEE DASHBOARD</title>
+    <style>
+   
+    </style>
 </head>
 <body>
     <H5> WELCOME TO THE EMPLOYEE DASHBOARD <%= employee.name %></H5><br><hr>
+    <%- include('./profileimage', {employee: employee}); %>
   
         <% if(task){ %>
             <p>you have a pending task <br>
